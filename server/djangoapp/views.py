@@ -95,22 +95,20 @@ def get_dealerships(request):
 def get_dealer_details(request, id):
     if request.method == "GET":
         context = {}
-        dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/"
+        dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/dealer-get"
         dealer = get_dealer_by_id_from_cf(dealer_url, id=id)
-        dealer_info = ' '.join([dealer.full_name])
         context["dealer"] = dealer
     
         review_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/review"
-        reviews = get_dealer_reviews_from_cf(review_url, id=id)
-        context["reviews"] = reviews
+        review = get_dealer_reviews_from_cf(review_url, id=id)
+        context["review"] = review
         
-        return HttpResponse(dealer_info)
+        return HttpResponse(context.get('dealer') + context.get('review'))
         #return render(request, 'djangoapp/dealer_details.html', context)
 # Create a `add_review` view to submit a review
 def add_review(request, id):
     context = {}
-    dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealerships"
-    dealer = get_dealer_by_id_from_cf(dealer_url, id=id)
+    dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/dealer-get"
     context["dealer"] = dealer
     if request.method == 'GET':
         # Get cars for the dealer
