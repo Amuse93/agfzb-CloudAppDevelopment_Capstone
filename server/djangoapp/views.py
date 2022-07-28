@@ -78,17 +78,15 @@ def registration_request(request):
             return redirect("djangoapp:index")
         else:
             context['message'] = "User already exists."
-            return render(request, 'djangoap/registration.html', context)
+            return render(request, 'djangoapp/registration.html', context)
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/dealer-get"
-        # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
         # Concat all dealer's short name
         dealer_names = ' '.join([dealer.full_name for dealer in dealerships])
-        # Return a list of dealer short name
         return HttpResponse(dealer_names)
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
@@ -97,15 +95,16 @@ def get_dealerships(request):
 def get_dealer_details(request, id):
     if request.method == "GET":
         context = {}
-        dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership"
+        dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/"
         dealer = get_dealer_by_id_from_cf(dealer_url, id=id)
+        dealer_info = ' '.join([dealer.full_name])
         context["dealer"] = dealer
     
         review_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/review"
         reviews = get_dealer_reviews_from_cf(review_url, id=id)
         context["reviews"] = reviews
         
-        return HttpResponse(context)
+        return HttpResponse(dealer_info)
         #return render(request, 'djangoapp/dealer_details.html', context)
 # Create a `add_review` view to submit a review
 def add_review(request, id):

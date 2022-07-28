@@ -37,16 +37,13 @@ def get_dealers_from_cf(url, **kwargs):
 def get_dealer_by_id_from_cf(url, id):
     results = []
     json_result = get_request(url, id=id)
-    
     if json_result:
-        dealers = json_result["body"]
-        dealer_doc = dealers["docs"][0]
-        dealer_obj = CarDealer(address=dealer_doc["address"], city=dealer_doc["city"],
-                                full_name=dealer_doc["full_name"], id=dealer_doc["id"], 
-                                lat=dealer_doc["lat"], long=dealer_doc["long"],
-                                short_name=dealer_doc["short_name"],
-                                st=dealer_doc["st"], zip=dealer_doc["zip"])
-        results.appende(dealer_obj)
+        dealers = json_result["body"][0]
+        dealer_obj = CarDealer(address=dealers["address"], city=dealers["city"], 
+                               full_name=dealers["full_name"], id=dealers["id"], lat=dealers["lat"], 
+                               long=dealers["long"], short_name=dealers["short_name"], st=dealers["st"], zip=dealers["zip"])
+        results.append(dealer_obj)
+
     return results
 
 def get_dealer_by_state_from_cf(url, st):
