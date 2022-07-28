@@ -56,6 +56,14 @@
     </nav>
     <!-- Add reviews as cards -->
     <div class="container">
+        <h2>Reviews for {{dealer.full_name}}</h2>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="container">
+        <a class="nav-link" href="{% url 'djangoapp:add_review' dealer.id %}">Add a Review</a>
+    </div>
+    {% endif %}
+    <div class="container">
         <div class="card-columns">
             {% for review in reviews %}
             <div class="col-auto mb-3">
@@ -82,11 +90,6 @@
             {% endfor %}
         </div>
     </div>
-    <!-- {% if user.is_authenticated %}
-    <div class="container">
-        <a class="nav-link" href="{% url 'djangoapp:add_review' dealer.id %}">Add a Review</a>
-    </div>
-    {% endif %} -->
 </body>
 
 </html>

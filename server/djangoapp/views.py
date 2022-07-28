@@ -97,7 +97,7 @@ def get_dealer_details(request, id):
     if request.method == "GET":
         context = {}
         dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/dealer-get"
-        dealer = get_dealer_by_id_from_cf(dealer_url, id=id)
+        dealer = get_dealer_by_id_from_cf(dealer_url, id=id)[0]
         context["dealer"] = dealer
     
         review_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/review"
@@ -110,6 +110,7 @@ def get_dealer_details(request, id):
 def add_review(request, id):
     context = {}
     dealer_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/dealership/dealer-get"
+    
     context["dealer"] = dealer
     if request.method == 'GET':
         # Get cars for the dealer
