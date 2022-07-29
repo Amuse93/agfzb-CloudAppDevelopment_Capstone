@@ -60,7 +60,7 @@
         <h1>Add a review for {{dealer.full_name}}</h1>
     </div>
     <div style = "position:relative; left:25px;">
-    <form action="{% url 'djangoapp:add_review' dealer.id %}">
+    <form action="{% url 'djangoapp:add_review' dealer.id %}" method="post">
         <div>
             <label for="content">
             Enter your review content: 

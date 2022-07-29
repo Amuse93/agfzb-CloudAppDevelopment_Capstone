@@ -136,10 +136,12 @@ def add_review(request, id):
                 if request.POST["purchasecheck"] == 'on':
                     payload["purchase"] = True
             review["purchase_date"] = request.POST["purchasedate"]
-            review["car_make"] = car.make.name
+            review["car_make"] = car.carmake.name
             review["car_model"] = car.name
             review["car_year"] = int(car.year.strftime("%Y"))
 
+            json_payload = {}
+            jspm_payload["review"] = review
             review_post_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/review"
-            post_request(review_post_url, new_payload, id=id)
-        return redirect("djangoapp:dealer_details", id=id)
+            post_request(review_post_url, json_payload, id=id)
+            return redirect("djangoapp:dealer_details", id=id)
