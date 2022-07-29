@@ -103,33 +103,25 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(text):
+    params = dict()
+        params["text"] = kwargs["text"]
+        params["version"] = kwargs["version"]
+        params["features"] = kwargs["features"]
+        params["return_analyzed_text"] = kwargs["return_analyzed_text"]
+        response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+                                auth=HTTPBasicAuth('apikey', api_key))
     url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/6cdf34ed-704c-4002-9c7a-20f5578cffdb"
     api_key ='NUDnTz-gLCFvFgYVx6Uk8OPFq8SP_JkyUXLkU3x7uvhH'
-    response = get_request(url, text=text, api_key=api_key, version='2020-08-01', features='sentiment', return_analyzed_text=True)
-    return response
+    authenticator = IAMAuthenticator(api_key)
+    nlu = NaturalLanguageUnderstandingV1(version='2020-08-01', authenticator=authenticator)
+    nlu.set_service_url(url)
+    response = nlu.analyze(text=text, features=Features(sentiment=SentimentOptions(targets=[text]))).get_result()
+    label = response['sentiment']['document']['label']
+    return label
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
-def get_request(url, **kwargs):
-    api_key = kwargs.get("api_key")
-    print("GET from {} ".format(url))
-    try:
-        if api_key:
-            params = dict()
-            params["text"] = kwargs["text"]
-            params["version"] = kwargs["version"]
-            params["features"] = kwargs["features"]
-            params["return_analyzed_text"] = kwargs["return_analyzed_text"]
-            response = requests.get(url, headers={'Content-Type': 'application/json'},
-                                    params=kwargs, auth=HTTPBasicAuth('apikey', api_key))
-        else:
-            response = requests.get(url, headers={'Content-Type': 'application/json'},
-                                    params=kwargs)
-    except:
-        print("Network exception occurred")
-    json_data = json.loads(response.text)
-    return json_data
 
 def post_request(url, payload, **kwargs):
     response = requests.post(url, params=kwargs, json=payload)

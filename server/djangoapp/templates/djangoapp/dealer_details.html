@@ -74,7 +74,7 @@
                     {% elif review.sentiment == "negative" %}
                         <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png" width="36px" height="36px"
                                    alt="Sentiment">
-                        {% else %}
+                    {% elif review.sentiment == "neutral" %}
                         <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png" width="36px" height="36px"
                                    alt="Sentiment">
                     {% endif %}
