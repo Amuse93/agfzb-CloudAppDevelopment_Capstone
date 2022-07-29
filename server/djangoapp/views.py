@@ -9,7 +9,7 @@ from datetime import datetime
 import logging
 import json
 from .models import CarMake, CarModel, CarDealer, DealerReview
-from .restapis import get_request, get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_by_state_from_cf, get_dealer_reviews_from_cf
+from .restapis import get_request, get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_by_state_from_cf, get_dealer_reviews_from_cf, post_request
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -115,15 +115,14 @@ def add_review(request, id):
     if request.method == 'GET':
         # Get cars for the dealer
         cars = CarModel.objects.all()
-        print(cars)
         context["cars"] = cars
-        
         return render(request, 'djangoapp/add_review.html', context)
+
     elif request.method == 'POST':
         if request.user.is_authenticated:
             username = request.user.username
             print(request.POST)
-            review = []
+            review = dict()
             car_id = request.POST["car"]
             car = CarModel.objects.get(pk=car_id)
             review["time"] = datetime.utcnow().isoformat()
@@ -134,14 +133,14 @@ def add_review(request, id):
             review["purchase"] = False
             if "purchasecheck" in request.POST:
                 if request.POST["purchasecheck"] == 'on':
-                    payload["purchase"] = True
+                    review["purchase"] = True
             review["purchase_date"] = request.POST["purchasedate"]
             review["car_make"] = car.carmake.name
             review["car_model"] = car.name
             review["car_year"] = int(car.year.strftime("%Y"))
 
             json_payload = {}
-            jspm_payload["review"] = review
+            json_payload["review"] = review
             review_post_url = "https://cc3fccd2.au-syd.apigw.appdomain.cloud/api/review"
             post_request(review_post_url, json_payload, id=id)
-            return redirect("djangoapp:dealer_details", id=id)
+        return redirect("djangoapp:dealer_details", id=id)
