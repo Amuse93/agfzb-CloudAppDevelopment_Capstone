@@ -3,8 +3,11 @@ import json
 # import related models here
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-
-
+from ibm_cloud_sdk_core import ApiException
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_watson.natural_language_understanding_v1 import Features,SentimentOptions
+import time
 
 
 # Create a `post_request` to make HTTP POST requests
@@ -103,25 +106,44 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(text):
-    params = dict()
-        params["text"] = kwargs["text"]
-        params["version"] = kwargs["version"]
-        params["features"] = kwargs["features"]
-        params["return_analyzed_text"] = kwargs["return_analyzed_text"]
-        response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
-                                auth=HTTPBasicAuth('apikey', api_key))
-    url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/6cdf34ed-704c-4002-9c7a-20f5578cffdb"
-    api_key ='NUDnTz-gLCFvFgYVx6Uk8OPFq8SP_JkyUXLkU3x7uvhH'
+    url = "https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/cbfa9db2-f9ff-4106-87d7-71516544428f"
+    api_key ='puW7rXTC5xRoBGQ_yaX-tg4cPrs8817ViOt4WsXF6oXF'
     authenticator = IAMAuthenticator(api_key)
-    nlu = NaturalLanguageUnderstandingV1(version='2020-08-01', authenticator=authenticator)
-    nlu.set_service_url(url)
-    response = nlu.analyze(text=text, features=Features(sentiment=SentimentOptions(targets=[text]))).get_result()
+    natural_language_understanding = NaturalLanguageUnderstandingV1(version='2021-08-01',authenticator=authenticator)
+    natural_language_understanding.set_service_url(url)
+    response = natural_language_understanding.analyze( text=text,features=Features(sentiment=SentimentOptions(targets=[text]))).get_result()
+    label=json.dumps(response, indent=2)
     label = response['sentiment']['document']['label']
-    return label
+    
+    
+    return(label)
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
+def get_request(url, **kwargs):
+    api_key = kwargs.get("api_key")
+    try:
+        if api_key:
+            params = dict()
+            params["text"] = kwargs["text"]
+            params["version"] = kwargs["version"]
+            params["features"] = kwargs["features"]
+            params["return_analyzed_text"] = kwargs["return_analyzed_text"]
+            response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
+                                    auth=HTTPBasicAuth('apikey', api_key))
+        else:
+            # Call get method of requests library with URL and parameters
+            response = requests.get(url, headers={'Content-Type': 'application/json'},
+                                    params=kwargs)
+    except:
+        # If any error occurs
+        print("Network exception occurred")
+
+    status_code = response.status_code
+    print("With status {} ".format(status_code))
+    json_data = json.loads(response.text)
+    return json_data
 
 def post_request(url, payload, **kwargs):
     response = requests.post(url, params=kwargs, json=payload)
